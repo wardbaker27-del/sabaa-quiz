@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DON'T BLOCK ME – SABAA EDITION</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background: linear-gradient(180deg, #e0f2fe 0%, #fbcfe8 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      color: #334155;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 450px;
+      min-height: 100vh;
+      background: #f8fafc;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    @media (min-width: 500px) {
+      .app-container {
+        min-height: 840px;
+        height: 840px;
+        border-radius: 36px;
+        border: 8px solid #ffffff;
+      }
+    }
+
+    .bg-decorations {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .decor {
+      position: absolute;
+      animation: float 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-12px) rotate(5deg); }
+    }
+
+    .screen {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 20px;
+      z-index: 2;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.6s ease;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-100%);
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+
+    .audio-btn {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 100;
+      background: #ffffff;
+      border: 2px solid #bae6fd;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    /* --- START SCREEN --- */
+    #start-screen {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .main-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #0284c7;
+      text-shadow: 0 2px 4px rgba(2,132,199,0.15);
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f43f5e;
+      margin-bottom: 24px;
+    }
+
+    .bears-hero {
+      width: 200px;
+      height: 160px;
+      margin-bottom: 24px;
+    }
+
+    .input-box {
+      width: 100%;
+      max-width: 300px;
+      padding: 14px 20px;
+      border-radius: 20px;
+      border: 3px solid #cbd5e1;
+      font-size: 18px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 20px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+      color: white;
+      border: none;
+      padding: 14px 40px;
+      border-radius: 25px;
+      font-size: 19px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(56,189,248,0.4);
+    }
+
+    /* --- QUIZ SCREEN --- */
+    .quiz-header {
+      width: 100%;
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Progress Box Top Navigation (1 - 10) */
+    .progress-bar-boxes {
+      display: flex;
+      gap: 5px;
+      background: #ffffff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      margin-bottom: 16px;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .box-step {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .box-step.active {
+      background: #0284c7;
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .box-step.correct {
+      background: #22c55e;
+      color: white;
+    }
+
+    .box-step.wrong {
+      background: #ef4444;
+      color: white;
+    }
+
+    .top-bear-stage {
+      width: 130px;
+      height: 100px;
+      margin-bottom: 8px;
+    }
+
+    .question-card {
+      background: #ffffff;
+      border: 2px dashed #93c5fd;
+      border-radius: 24px;
+      padding: 16px 20px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .question-tag {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fde047;
+      color: #854d0e;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 4px 16px;
+      border-radius: 12px;
+    }
+
+    .question-text {
+      font-size: 19px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-top: 4px;
+    }
+
+    /* Grid options cards */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .option-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #ffffff;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: all 0.25s ease;
+      min-height: 130px;
+    }
+
+    .option-card.correct {
+      border-color: #22c55e !important;
+      background: #f0fdf4 !important;
+    }
+
+    .option-card.wrong {
+      border-color: #ef4444 !important;
+      background: #fef2f2 !important;
+    }
+
+    .option-illustration {
+      width: 65px;
+      height: 55px;
+      margin-bottom: 6px;
+    }
+
+    .option-text {
+      font-size: 15px;
+      font-weight: 700;
+      color: #334155;
+      text-align: center;
+    }
+
+    /* --- END DIALOGUE SCREEN --- */
+    .dialogue-stage {
+      width: 100%;
+      height: 240px;
+      position: relative;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, transparent 70%, #e2e8f0 70%);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .speech-bubble {
+      position: absolute;
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 800;
+      color: #1e293b;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      max-width: 220px;
+      text-align: center;
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+
+    .speech-bubble.show {
+      opacity: 1;
+    }
+
+    #bubble-panda { top: 20px; right: 20px; }
+    #bubble-bear { top: 80px; left: 20px; }
+
+    .walking-panda {
+      position: absolute;
+      bottom: 25px; right: 10px;
+      width: 100px; height: 90px;
+      transition: right 3s linear;
+    }
+
+    .waiting-bear {
+      position: absolute;
+      bottom: 25px; left: 20px;
+      width: 100px; height: 90px;
+    }
+
+    .result-card {
+      background: #ffffff;
+      border-radius: 28px;
+      padding: 24px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      margin-top: 20px;
+    }
+
+    .score-badge {
+      font-size: 42px;
+      font-weight: 900;
+      color: #0284c7;
+      margin: 10px 0;
+    }
+
+    .result-msg {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f43f5e;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <button class="audio-btn" id="audio-toggle">🎵</button>
+
+  <div class="bg-decorations">
+    <svg class="decor" style="top: 8%; left: 8%; width: 24px;" viewBox="0 0 24 24" fill="#f43f5e"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    <svg class="decor" style="top: 15%; right: 10%; width: 30px;" viewBox="0 0 24 24" fill="#38bdf8"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>
+  </div>
+
+  <!-- START SCREEN -->
+  <div class="screen active" id="start-screen">
+    <h1 class="main-title">DON'T BLOCK ME</h1>
+    <h2 class="subtitle">قديش بتعرفي صبا؟ 💗</h2>
+
+    <div class="bears-hero" id="hero-bears"></div>
+
+    <input type="text" id="player-name" class="input-box" placeholder="اكتبي اسمك هون..." autocomplete="off">
+    <button class="btn-primary" id="start-btn">🌸 بدء الاختبار 🌸</button>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div class="screen" id="quiz-screen">
+    <div class="quiz-header">
+      <div class="progress-bar-boxes" id="progress-boxes"></div>
+      <div class="top-bear-stage" id="top-bear-container"></div>
+    </div>
+
+    <div class="question-card">
+      <div class="question-tag" id="q-number-tag">السؤال 1</div>
+      <div class="question-text" id="q-text">جارٍ تحميل السؤال...</div>
+    </div>
+
+    <div class="options-grid" id="options-container"></div>
+  </div>
+
+  <!-- DIALOGUE SCREEN -->
+  <div class="screen" id="dialogue-screen">
+    <h2 class="main-title" style="margin-top: 20px;">لحظة الحسم! 🐾</h2>
+
+    <div class="dialogue-stage">
+      <div class="speech-bubble" id="bubble-panda"></div>
+      <div class="speech-bubble" id="bubble-bear"></div>
+      <div class="walking-panda" id="walking-panda"></div>
+      <div class="waiting-bear" id="waiting-bear"></div>
+    </div>
+
+    <button class="btn-primary" id="to-result-btn" style="display: none; margin-top: 20px;">عرض النتيجة 🏆</button>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="screen" id="result-screen">
+    <h1 class="main-title" style="margin-top: 30px;">النتيجة النهائية! 🎉</h1>
+    
+    <div class="result-card">
+      <h3 style="font-size: 20px;" id="result-name">درجتك يا صديقة صبا</h3>
+      <div class="score-badge" id="score-text">0 / 10</div>
+      <div class="result-msg" id="result-message"></div>
+      <button class="btn-primary" onclick="location.reload()">إعادة الاختبار 🔄</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  class SoundEngine {
+    constructor() { this.ctx = null; this.muted = false; }
+    init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+    playTone(freq, type, duration) {
+      if (this.muted || !this.ctx) return;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + duration);
+    }
+    playCorrect() {
+      this.init();
+      this.playTone(523.25, 'sine', 0.15);
+      setTimeout(() => this.playTone(659.25, 'sine', 0.15), 100);
+      setTimeout(() => this.playTone(783.99, 'sine', 0.3), 200);
+    }
+    playWrong() {
+      this.init();
+      this.playTone(220, 'triangle', 0.2);
+      setTimeout(() => this.playTone(180, 'triangle', 0.3), 150);
+    }
+  }
+
+  const audio = new SoundEngine();
+  document.getElementById('audio-toggle').addEventListener('click', () => {
+    audio.muted = !audio.muted;
+    document.getElementById('audio-toggle').textContent = audio.muted ? '🔇' : '🎵';
+  });
+
+  // Precise Bubu Panda Vector
+  function getPandaSVG() {
+    return `<svg viewBox="0 0 100 90" width="100%" height="100%">
+      <ellipse cx="50" cy="52" rx="34" ry="28" fill="#ffffff" stroke="#262626" stroke-width="3.5"/>
+      <circle cx="22" cy="30" r="10" fill="#262626"/>
+      <circle cx="78" cy="30" r="10" fill="#262626"/>
+      <ellipse cx="37" cy="48" rx="6.5" ry="8.5" fill="#262626"/>
+      <ellipse cx="63" cy="48" rx="6.5" ry="8.5" fill="#262626"/>
+      <circle cx="38.5" cy="46.5" r="2.5" fill="#ffffff"/>
+      <circle cx="64.5" cy="46.5" r="2.5" fill="#ffffff"/>
+      <ellipse cx="27" cy="56" rx="8" ry="5" fill="#fda4af" opacity="0.85"/>
+      <ellipse cx="73" cy="56" rx="8" ry="5" fill="#fda4af" opacity="0.85"/>
+      <path d="M50 56 Q46 62 50 64 Q54 62 50 56 Z" fill="#262626"/>
+      <polygon points="50,70 44,65 56,65" fill="#262626"/>
+    </svg>`;
+  }
+
+  // Precise Dudu Brown Bear Vector
+  function getBearSVG() {
+    return `<svg viewBox="0 0 100 90" width="100%" height="100%">
+      <ellipse cx="50" cy="52" rx="34" ry="28" fill="#92400e" stroke="#262626" stroke-width="3.5"/>
+      <circle cx="22" cy="30" r="10" fill="#78350f" stroke="#262626" stroke-width="2.5"/>
+      <circle cx="78" cy="30" r="10" fill="#78350f" stroke="#262626" stroke-width="2.5"/>
+      <ellipse cx="50" cy="56" rx="13" ry="9" fill="#fde68a"/>
+      <circle cx="38" cy="48" r="4" fill="#262626"/>
+      <circle cx="62" cy="48" r="4" fill="#262626"/>
+      <ellipse cx="27" cy="56" rx="7" ry="4" fill="#f43f5e" opacity="0.6"/>
+      <ellipse cx="73" cy="56" rx="7" ry="4" fill="#f43f5e" opacity="0.6"/>
+      <ellipse cx="50" cy="53" rx="3.5" ry="2.5" fill="#262626"/>
+    </svg>`;
+  }
+
+  function getBothBearsSVG() {
+    return `<svg viewBox="0 0 140 90" width="100%" height="100%">
+      <g transform="translate(0, 5)">${getPandaSVG()}</g>
+      <g transform="translate(45, 5)">${getBearSVG()}</g>
+    </svg>`;
+  }
+
+  document.getElementById('hero-bears').innerHTML = getBothBearsSVG();
+
+  const questions = [
+    { q: "شو أكتر أكلة صبا بتحبها؟", options: [" المعكرونة 🍝", " البيتزا 🍕", " البرغر 🍔", " السوشي 🍣"], correct: 0 },
+    { q: "شو مشروب صبا المفضّل؟", options: [" الشاي 🍵", " القهوة ☕", " الكوفي 🧋", " العصير 🥤"], correct: 2 },
+    { q: "أي ألوان بتحب صبا؟", options: [" الوردي بس 💗", " الأزرق بس 💙", " ألوان كثيرة وكل الألوان 🌈", " الأسود بس 🖤"], correct: 2 },
+    { q: "مع مين بتحب صبا تطلع؟", options: [" تسنيم وسيلينا 👭", " أهلها 👨‍👩‍👧", " لحالها 🧸", " كل صحباتها 👯"], correct: 0 },
+    { q: "وين بتحب صبا تقضي وقتها؟", options: [" بالبيت 🏠", " بالمول 🛍️", " بالحديقة 🌳", " بمدينة الألعاب 🎡"], correct: 1 },
+    { q: "صبا بتحب أي فصل أكثر؟", options: [" الصيف ☀️", " الشتا ❄️", " الربيع 🌸", " الخريف 🍂"], correct: 1 },
+    { q: "شو أقرب لسهرة صبا الحلوة؟", options: [" فيلم وسناك 🎬", " غنا ووناسة 🎤", " ألعاب وتحديات 🎮", " قراءة وهدوء 📚"], correct: 0 },
+    { q: "شو ممكن يفرّح صبا أكثر؟", options: [" هدية مفاجأة 🎁", " رسالة من القلب 💌", " وجبة بتحبها 🍝", " طلعة مع ناسها 🫶"], correct: 1 },
+    { q: "لو عند صبا يوم فاضي، شو بتختار؟", options: [" راحة بالبيت 🛌", " طلعة وتسوق 🛍️", " كوفي مع الصحبات ☕", " تغيير جو 🌅"], correct: 2 },
+    { q: "شو أهم إشي عند صبا بالصحبة؟", options: [" الصدق والوفا 🤍", " الضحك والوناسة 😂", " التفاهم 🧠", " كلهم مع بعض 💗"], correct: 3 }
+  ];
+
+  let currentQ = 0;
+  let score = 0;
+  let playerName = "";
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    const input = document.getElementById('player-name').value.trim();
+    if (!input) {
+      alert("لطفاً اكتبي اسمك أولاً ✨");
+      return;
+    }
+    playerName = input;
+    audio.init();
+    initProgressBar();
+    loadQuestion(0);
+    showScreen('quiz-screen');
+  });
+
+  function initProgressBar() {
+    const container = document.getElementById('progress-boxes');
+    container.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+      const box = document.createElement('div');
+      box.className = `box-step ${i === 0 ? 'active' : ''}`;
+      box.id = `box-${i}`;
+      box.textContent = 10 - i;
+      container.appendChild(box);
+    }
+  }
+
+  function loadQuestion(index) {
+    document.querySelectorAll('.box-step').forEach((b, i) => {
+      if (i === index) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+
+    document.getElementById('q-number-tag').textContent = `السؤال ${index + 1}`;
+    document.getElementById('q-text').textContent = questions[index].q;
+
+    const bearContainer = document.getElementById('top-bear-container');
+    bearContainer.innerHTML = index % 2 === 0 ? getPandaSVG() : getBearSVG();
+
+    const grid = document.getElementById('options-container');
+    grid.innerHTML = '';
+
+    questions[index].options.forEach((optText, optIdx) => {
+      const card = document.createElement('div');
+      card.className = 'option-card';
+      card.innerHTML = `
+        <div class="option-illustration">${optIdx % 2 === 0 ? getPandaSVG() : getBearSVG()}</div>
+        <div class="option-text">${optText}</div>
+      `;
+      card.onclick = () => handleAnswer(optIdx, card);
+      grid.appendChild(card);
+    });
+  }
+
+  function handleAnswer(selectedIndex, cardEl) {
+    const q = questions[currentQ];
+    const isCorrect = selectedIndex === q.correct;
+    const box = document.getElementById(`box-${currentQ}`);
+
+    document.querySelectorAll('.option-card').forEach(c => c.style.pointerEvents = 'none');
+
+    if (isCorrect) {
+      cardEl.classList.add('correct');
+      box.classList.add('correct');
+      audio.playCorrect();
+      score++;
+    } else {
+      cardEl.classList.add('wrong');
+      box.classList.add('wrong');
+      audio.playWrong();
+    }
+
+    setTimeout(() => {
+      currentQ++;
+      if (currentQ < 10) {
+        loadQuestion(currentQ);
+      } else {
+        startEndingScene();
+      }
+    }, 1200);
+  }
+
+  function startEndingScene() {
+    showScreen('dialogue-screen');
+    document.getElementById('walking-panda').innerHTML = getPandaSVG();
+    document.getElementById('waiting-bear').innerHTML = getBearSVG();
+
+    const pandaBubble = document.getElementById('bubble-panda');
+    const bearBubble = document.getElementById('bubble-bear');
+
+    setTimeout(() => {
+      document.getElementById('walking-panda').style.right = '150px';
+    }, 300);
+
+    setTimeout(() => {
+      pandaBubble.textContent = "هل أحظرك؟ 🐼";
+      pandaBubble.classList.add('show');
+    }, 1500);
+
+    setTimeout(() => {
+      bearBubble.textContent = "لكن لا، زيف في صداقتي معك! 🧸";
+      bearBubble.classList.add('show');
+    }, 3200);
+
+    setTimeout(() => {
+      pandaBubble.textContent = "انظري إلى درجتي وقرري بمدى معرفتي لك!";
+    }, 5000);
+
+    setTimeout(() => {
+      document.getElementById('to-result-btn').style.display = 'block';
+    }, 6500);
+  }
+
+  document.getElementById('to-result-btn').addEventListener('click', () => {
+    document.getElementById('result-name').textContent = `درجتك يا ${playerName} 💗`;
+    document.getElementById('score-text').textContent = `${score} / 10`;
+
+    let msg = "";
+    if (score >= 9) msg = "يا سلام! صديقة صبا الموسوعة! 🏆";
+    else if (score >= 6) msg = "معرفتك بصبا حلوة، بس لسه في أسرار! 🐼";
+    else if (score >= 3) msg = "في محبة، بس المعلومات بدها تحديث! 😂";
+    else msg = "الدببة بدها تعرّفك على صبا من أول وجديد! 😭";
+
+    document.getElementById('result-message').textContent = msg;
+    showScreen('result-screen');
+  });
+</script>
+</body>
+</html>
